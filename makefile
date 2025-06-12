@@ -1,22 +1,23 @@
-CC = g++
-LD = g++
-CFLAGS = -c -g -O -std=c++0x -Ic:/gsl -lgsl -lgslcblas -fopenmp
-#CFLAGS = -c -g -O -std=c++0x -Ic:/gsl -lgsl -lgslcblas
-LDFLAGS = -Lc:/gsl
-LIBS = -ldl -lgsl -lgslcblas
+# Compiler and tools
+CXX = g++
+CXXFLAGS = -Wall -Wextra -O2 -std=c++11 -fopenmp -g
+LDFLAGS = -lgsl -lgslcblas -ldl
 
-PROG_OBJS = TestUoc.o uocOption.o optimizer.o
+# Source files and objects
+SRCS = TestUoc.cpp uocOption.cpp optimizer.cpp
+OBJS = $(SRCS:.cpp=.o)
+TARGET = TestUoc.out
 
-TGTS = TestUoc.out
+# Default target
+all: $(TARGET)
 
-$(TGTS):$(PROG_OBJS)
-	$(CC) $(LFLAGS) $(PROG_OBJS) $(LIBS) -o $(TGTS)
- 
-.SUFFIXES:.cpp
- 
-.cpp.o:
-	$(CC) $(CFLAGS) $<
+$(TARGET): $(OBJS)
+	$(CXX) $(OBJS) -o $(TARGET) $(LDFLAGS)
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(TGTS)
-	rm -f *.o
+	rm -f *.o $(TARGET)
+
+.PHONY: all clean

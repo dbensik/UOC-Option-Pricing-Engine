@@ -5,254 +5,84 @@
 #include "UpOutCallOption.hpp"
 #include <tuple>
 
-/////////////////////////////////////////////////////////////////////////////////////
-void UpOutCallOption::init() { // Default call option
-	cout << "Inside UpOutCallOption::init()" << endl;
-	//init();
+using std::vector;
+using std::cout;
+using std::endl;
+
+UpOutCallOption::UpOutCallOption() {
+    init();
 }
 
-UpOutCallOption::UpOutCallOption(){	// Initialise all default values
-	//cout << "Inside UpOutCallOption::UpOutCallOption()" << endl;
-	S = 1950;  // Initial stock price
-	x = log(S); // Initial log price
-	K = 2050;  // Strike price
-	LogK = log(K);
-	B = 2300;  // Upper barrier for the up-and-out call
-	LogB = log(B);
-	r = 0.0025;  // Risk-free rate
-	q = 0.015;  // dividend rate on the stock
-	T = 0.5;  // Expiration (years)
-	t = 0; // "current" time
-	tau = T-t; // Time to maturity
-	sigma = 0.25;  // volatility of the stock
-	nu = 0.35;  //  Given   ????????
-	theta = -0.4;  //  Given   ????????
-	Y = 0.4;  //  Given   ????????
-	Smin = 1400;  // 1400
-	LogSmin = log(Smin);
-	numPrices = 400; // 400
-	numTimes = 200; // 200
-	deltaTau = (T - t)/(numTimes - 1);  // time step
-	deltaS = (B - Smin)/(numPrices - 1) ;  // stock price step
-	deltax = (LogB - LogSmin)/(numPrices - 1);
-
-	lambdaN = sqrt((pow(theta,2)/pow(sigma,4))
-		+(2/(sigma * sigma * nu))) + theta/(sigma * sigma);
-	lambdaP = sqrt((pow(theta,2)/pow(sigma,4))
-		+(2/(sigma * sigma * nu))) - theta/(sigma * sigma);
-
-	Bl = ((UpOutCallOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) - 
-		(r - q + UpOutCallOption::omega(deltax) - 0.5 * UpOutCallOption::sigma2(deltax))
-		 * (deltaTau / (2 * deltax));
-	
-	Bu = ((UpOutCallOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) + 
-		(r - q + UpOutCallOption::omega(deltax) - 0.5 * UpOutCallOption::sigma2(deltax))
-		 * (deltaTau / (2 * deltax));
+UpOutCallOption::UpOutCallOption(double K, double B, double sigma, double nu, double theta, double Y)
+    : K(K), B(B), sigma(sigma), nu(nu), theta(theta), Y(Y) {
+    init();
 }
 
-UpOutCallOption::UpOutCallOption(const double strike, const double barrier, const double sigmaParam, 
-	const double nuParam, const double thetaParam, const double YParam){
-    //cout << "UpOutCallOption Constructor with parameters" << endl;
-    S = 100;  // Initial stock price
-	x = log(S); // Initial log price
-	K = strike;  // Strike price
-	LogK = log(K);
-	B = barrier;  // Upper barrier for the up-and-out call
-	LogB = log(B);
-	r = 0.0025;  // Risk-free rate
-	q = 0.015;  // dividend rate on the stock
-	T = 0.5;  // Expiration (years)
-	t = 0; // "current" time
-	tau = T-t; // Time to maturity
-	sigma = sigmaParam;  // volatility of the stock
-	nu = nuParam;  //  Given   ????????
-	theta = thetaParam;  //  Given   ????????
-	Y = YParam;  //  Given   ????????
-	Smin = 5;  // Need to choose this value for mesh size
-	LogSmin = log(Smin);
-	numPrices = 100;
-	numTimes = 100;
-	deltaTau = (T - t)/(numTimes - 1);  // time step
-	deltaS = (B - Smin)/(numPrices - 1) ;  // stock price step
-	deltax = (LogB - LogSmin)/(numPrices - 1);
-
-	lambdaN = sqrt((pow(theta,2)/pow(sigma,4))
-		+(2/(sigma * sigma * nu))) + theta/(sigma * sigma);
-	lambdaP = sqrt((pow(theta,2)/pow(sigma,4))
-		+(2/(sigma * sigma * nu))) - theta/(sigma * sigma);
-
-	Bl = ((UpOutCallOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) - 
-		(r - q + UpOutCallOption::omega(deltax) - 0.5 * UpOutCallOption::sigma2(deltax))
-		 * (deltaTau / (2 * deltax));
-	
-	Bu = ((UpOutCallOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) + 
-		(r - q + UpOutCallOption::omega(deltax) - 0.5 * UpOutCallOption::sigma2(deltax))
-		 * (deltaTau / (2 * deltax));  
+UpOutCallOption::UpOutCallOption(double sigma, double nu, double theta, double Y)
+    : sigma(sigma), nu(nu), theta(theta), Y(Y) {
+    init();
 }
 
-UpOutCallOption::UpOutCallOption(const double sigmaParam, const double nuParam,
-	const double thetaParam, const double YParam){
-    //cout << "UpOutCallOption Constructor with parameters" << endl;
-    S = 100;  // Initial stock price
-	x = log(S); // Initial log price
-	K = 100;  // Strike price
-	LogK = log(K);
-	B = 125;  // Upper barrier for the up-and-out call
-	LogB = log(B);
-	r = 0.0025;  // Risk-free rate
-	q = 0.015;  // dividend rate on the stock
-	T = 0.5;  // Expiration (years)
-	t = 0; // "current" time
-	tau = T-t; // Time to maturity
-	sigma = sigmaParam;  // volatility of the stock
-	nu = nuParam;  //  Given   ????????
-	theta = thetaParam;  //  Given   ????????
-	Y = YParam;  //  Given   ????????
-	Smin = 5;  // Need to choose this value for mesh size
-	LogSmin = log(Smin);
-	numPrices = 100;
-	numTimes = 100;
-	deltaTau = (T - t)/(numTimes - 1);  // time step
-	deltaS = (B - Smin)/(numPrices - 1) ;  // stock price step
-	deltax = (LogB - LogSmin)/(numPrices - 1);
-
-	lambdaN = sqrt((pow(theta,2)/pow(sigma,4))
-		+(2/(sigma * sigma * nu))) + theta/(sigma * sigma);
-	lambdaP = sqrt((pow(theta,2)/pow(sigma,4))
-		+(2/(sigma * sigma * nu))) - theta/(sigma * sigma);
-
-	Bl = ((UpOutCallOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) - 
-		(r - q + UpOutCallOption::omega(deltax) - 0.5 * UpOutCallOption::sigma2(deltax))
-		 * (deltaTau / (2 * deltax));
-	
-	Bu = ((UpOutCallOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) + 
-		(r - q + UpOutCallOption::omega(deltax) - 0.5 * UpOutCallOption::sigma2(deltax))
-		 * (deltaTau / (2 * deltax));  
+UpOutCallOption::UpOutCallOption(double strike, double barrier, const vector<double>& params)
+    : K(strike), B(barrier), sigma(params[0]), nu(params[1]), theta(params[2]), Y(params[3]) {
+    init();
 }
 
-UpOutCallOption::UpOutCallOption(const double strike, const double barrier, const vector<double>& params){
-    //cout << "UpOutCallOption Constructor with parameter array" << endl;
-    S = 100;  // Initial stock price
-	x = log(S); // Initial log price
-	K = strike;  // Strike price
-	LogK = log(K);
-	B = barrier;  // Upper barrier for the up-and-out call
-	LogB = log(B);
-	r = 0.0025;  // Risk-free rate
-	q = 0.015;  // dividend rate on the stock
-	T = 0.5;  // Expiration (years)
-	t = 0; // "current" time
-	tau = T-t; // Time to maturity
-	sigma = params[0];  // volatility of the stock
-	nu = params[1];  //  Given
-	theta = params[2];  //  Give
-	Y = params[3];  //  Given 
-	Smin = 5;  // Need to choose this value for mesh size
-	LogSmin = log(Smin);
-	numPrices = 100;
-	numTimes = 100;
-	deltaTau = (T - t)/(numTimes - 1);  // time step
-	deltaS = (B - Smin)/(numPrices - 1) ;  // stock price step
-	deltax = (LogB - LogSmin)/(numPrices - 1);
-
-	lambdaN = sqrt((pow(theta,2)/pow(sigma,4))
-		+(2/(sigma * sigma * nu))) + theta/(sigma * sigma);
-	lambdaP = sqrt((pow(theta,2)/pow(sigma,4))
-		+(2/(sigma * sigma * nu))) - theta/(sigma * sigma);
-
-	Bl = ((UpOutCallOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) - 
-		(r - q + UpOutCallOption::omega(deltax) - 0.5 * UpOutCallOption::sigma2(deltax))
-		 * (deltaTau / (2 * deltax));
-	
-	Bu = ((UpOutCallOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) + 
-		(r - q + UpOutCallOption::omega(deltax) - 0.5 * UpOutCallOption::sigma2(deltax))
-		 * (deltaTau / (2 * deltax));  
+UpOutCallOption::UpOutCallOption(const UpOutCallOption& option2) {
+    copy(option2);
 }
 
-void UpOutCallOption::copy(const UpOutCallOption& o2){
-	S = o2.S;  // Initial stock price
-	x = o2.x;
-	K = o2.K;  // Strike price
-	LogK = o2.LogK;
-	B = o2.B;  // Upper barrier for the up-and-out call
-	LogB - o2.LogB;
-	r = o2.r;  // Risk-free rate
-	q = o2.q;  // dividend rate on the stock
-	T = o2.T;  // Expiration (years)
-	t = o2.t; // "current" time
-	tau = o2.tau; // Time to maturity
-	sigma = o2.sigma;  // volatility of the stock
-	nu = o2.nu;  //  Given   ????????
-	theta = o2.theta;  //  Given   ????????
-	Y = o2.Y;  //  Given   ????????
-	Smin = o2.Smin;  // Need to choose this value for mesh size
-	LogSmin = o2.LogSmin;
-	numPrices = o2.numPrices;
-	numTimes = o2.numTimes;
-	deltaTau = o2.deltaTau;  // time step
-	deltaS = o2.deltaS;  // stock price step
-	deltax = o2.deltax;
+UpOutCallOption::~UpOutCallOption() {}
 
-	lambdaN = o2.lambdaN;
-	lambdaP = o2.lambdaP;
-	Bl = o2.Bl;
-	Bu = o2.Bu;	
+UpOutCallOption& UpOutCallOption::operator=(const UpOutCallOption& option2) {
+    if (this != &option2) {
+        copy(option2);
+    }
+    return *this;
 }
 
-UpOutCallOption::UpOutCallOption(const UpOutCallOption& o2){ // Copy constructor
-	cout << "UpOutCallOption copy constructor" << endl;
-	copy(o2);
+void UpOutCallOption::init() {
+    S = 100; x = log(S);
+    LogK = log(K);
+    LogB = log(B);
+    r = 0.0025; q = 0.015;
+    T = 0.5; t = 0; tau = T - t;
+    Smin = 5; LogSmin = log(Smin);
+    numPrices = 100; numTimes = 100;
+    deltaTau = tau / (numTimes - 1);
+    deltaS = (B - Smin) / (numPrices - 1);
+    deltax = (LogB - LogSmin) / (numPrices - 1);
+
+    lambdaN = sqrt((pow(theta, 2) / pow(sigma, 4)) + (2 / (sigma * sigma * nu))) + theta / (sigma * sigma);
+    lambdaP = sqrt((pow(theta, 2) / pow(sigma, 4)) + (2 / (sigma * sigma * nu))) - theta / (sigma * sigma);
+
+    Bl = ((sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) - 
+         (r - q + omega(deltax) - 0.5 * sigma2(deltax)) * (deltaTau / (2 * deltax));
+    Bu = ((sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) + 
+         (r - q + omega(deltax) - 0.5 * sigma2(deltax)) * (deltaTau / (2 * deltax));
 }
 
-UpOutCallOption::~UpOutCallOption() {
-	//cout << "UpOutCallOption destructor" << endl;
-	//cout << endl;// Virual Destructor
-}
-
-UpOutCallOption& UpOutCallOption::operator = (const UpOutCallOption& option2) {
-	if (this == &option2) return *this;
-	copy (option2);
-	return *this;
+void UpOutCallOption::copy(const UpOutCallOption& o2) {
+    S = o2.S; x = o2.x; K = o2.K; LogK = o2.LogK;
+    B = o2.B; LogB = o2.LogB; r = o2.r; q = o2.q;
+    T = o2.T; t = o2.t; tau = o2.tau;
+    sigma = o2.sigma; nu = o2.nu; theta = o2.theta; Y = o2.Y;
+    Smin = o2.Smin; LogSmin = o2.LogSmin;
+    numPrices = o2.numPrices; numTimes = o2.numTimes;
+    deltaTau = o2.deltaTau; deltaS = o2.deltaS; deltax = o2.deltax;
+    lambdaN = o2.lambdaN; lambdaP = o2.lambdaP;
+    Bl = o2.Bl; Bu = o2.Bu;
 }
 
 void UpOutCallOption::dumpPrint() {
-	cout << "\nStock price is $" << S << endl;
-	cout << "Log Stock price is $" << x << endl;
-	cout << "Strike price is $" << K << endl;
-	cout << "Log Strike price is $" << LogK << endl;
-	cout << "Knockout Barrier price is $" << B << endl;
-	cout << "Log Knockout Barrier price is $" << LogB << endl;
-	cout << "Minimum Stock Price is $" << Smin << endl;
-	cout << "Minimum Log Stock Price is $" << LogSmin << endl;
-	cout << "Risk-free rate is " << r*100 << "%" << endl;
-	cout << "Dividend rate is " << q*100 <<"%" << endl;
-	cout << "Expiration, T, (years) is " << T << endl;
-	cout << "Current time, t, (years) is " << t << endl;
-	cout << "Time to maturity, tau, (years) is " << tau << endl;
-	cout << "sigma is " << sigma << endl;
-	cout << "nu is " << nu << endl;
-	cout << "theta is " << theta << endl;
-	cout << "Y is " << Y << endl;
-	cout << "There will be " << numTimes << " deltaTaus";
-	cout << " beginning at expiration when tau = " << T-t;
-	cout << " and ending at the current time when tau = " << T-0;
-	cout << " with each deltaTau = " << deltaTau << endl;
-	cout << "There will be " << numPrices << " price intervals";
-	cout << " beginning at " << Smin;
-	cout << " and ending at " << B << " with each step equal to ";
-	cout << deltaS << endl;
-	cout << "There will be " << numPrices << " log price intervals";
-	cout << " beginning at " << LogSmin;
-	cout << " and ending at " << LogB << " with each step equal to ";
-	cout << deltax << endl;
-	cout << "lambdaN is " << lambdaN << endl;
-	cout << "lambdaP is " << lambdaP << endl;
-	cout << "Bu is " << Bu << endl;//" at tau = " << tau << endl;
-	cout << "Bl is " << Bl << endl;// " at tau = " << tau << endl;
-	cout << "sigma2(deltax): " << sigma2(deltax) << endl;
-	cout << "omega(deltax): " << omega(deltax) << endl;
-	cout << "Grid is " << numPrices << " x " << numTimes << endl;
-	cout << endl;
+    cout << "\nStock price: $" << S << ", Strike: $" << K << ", Barrier: $" << B << endl;
+    cout << "Rates -> r: " << r << ", q: " << q << ", Vol: " << sigma << endl;
+    cout << "Params -> nu: " << nu << ", theta: " << theta << ", Y: " << Y << endl;
+    cout << "Time -> T: " << T << ", t: " << t << ", tau: " << tau << endl;
+    cout << "Mesh -> Prices: " << numPrices << ", Times: " << numTimes << endl;
+    cout << "Steps -> deltaTau: " << deltaTau << ", deltaS: " << deltaS << ", deltax: " << deltax << endl;
+    cout << "Lambdas -> N: " << lambdaN << ", P: " << lambdaP << endl;
+    cout << "Coefficients -> Bl: " << Bl << ", Bu: " << Bu << endl;
 }
 
 void UpOutCallOption::printGrid(double **array) const {
@@ -325,103 +155,33 @@ void uocOption::computeGVectors(std::vector<double>& g1LambdaN,
     }
 }
 
-double UpOutCallOption::price(){
-    int gslDim = numPrices - 2;
-    auto [lower, diag, upper, rhs, solution] = initializeGslVectors(gslDim);
+double UpOutCallOption::price() {
+    vector<vector<double>> grid(numTimes, vector<double>(numPrices, 0.0));
 
-    for (int i = 0; i < gslDim - 1; i++) {
-        gsl_vector_set(lower, i, l());
-        gsl_vector_set(upper, i, u());
+    // Set terminal condition (payoff)
+    for (int j = 0; j < numPrices; ++j) {
+        double logS = LogSmin + j * deltax;
+        double S = exp(logS);
+        grid[numTimes - 1][j] = std::max(S - K, 0.0);
     }
 
-    for (int i = 0; i < gslDim; i++) {
-        gsl_vector_set(diag, i, d(i+1));
+    // Boundary conditions
+    for (int i = 0; i < numTimes; ++i) {
+        grid[i][0] = 0.0;                 // S -> 0
+        grid[i][numPrices - 1] = 0.0;     // S -> B (knocked out)
     }
 
-	/* // GSL print statements
-	    for (int i = 0; i < gslDim ; i++) // gsl print statements
-	    {   
-	        printf ("diag_%d = %g\n", i, gsl_vector_get (diag, i));
-	    }
-	        for (int i = 0; i < gslDim - 1 ; i++) // gsl print statements
-	    {   
-	        printf ("lower_%d = %g\n", i, gsl_vector_get (lower, i));
-	        printf ("upper_%d = %g\n", i, gsl_vector_get (upper, i));
-	    }
-	*/
-    
-    vector<double> w(numPrices,0.0);
-
-
-    	std::vector<double> g1LambdaN(numPrices - 1, 0.0);
-    	std::vector<double> g1LambdaP(numPrices - 1, 0.0);
-    	std::vector<double> g2LambdaN(numPrices - 1, 0.0);
-   	std::vector<double> g2LambdaP(numPrices - 1, 0.0);
-    	computeGVectors(g1LambdaN, g1LambdaP, g2LambdaN, g2LambdaP);
-
-	double **grid = new double*[numPrices];
-	for (int i = 0; i < numPrices; ++i){
-		grid[i] = new double[numTimes];
-	}
-	// set array by looping over col then row
-	for (int j = 0 ; j < numTimes; j++) {// loop over columns
-    	for (int i = 0; i < numPrices; i++) {// loop over rows
-        		grid[i][j] = 0;
-        	}
-    }
-    
-	for (int j = 0 ; j < numTimes; j++) { // loop over columns
-	//for (int j = 0 ; j < 2; j++) {
-    	//cout << "j = " << j << endl;
-        //cout << "\ntau = " << myOption.tau - ((myOption.numTimes-1-j) * myOption.deltaTau) << endl;
-    	if (j == 0) {
-    		for (int i = 1; i < numPrices - 1; i++) { // loop over rows
-        		w[i] = payoff(LogSmin + i * deltax);
-        		grid[i][j] = w[i];
-				//cout << "w[" << i  << "] = " << w[i] << endl;
-        	}
-        	for (int i = 1; i < numPrices - 1; i++) { // loop over rows
-        		gsl_vector_set(rhs, i - 1, w[i] + (deltaTau / nu) * 
-        			R(i, j, grid,g1LambdaN,g1LambdaP,g2LambdaN,g2LambdaP));
-                //printf ("rhs[%d] = %g\n", i-1, gsl_vector_get(rhs, i-1));
-        	}
-        }
-    	else {
-    		gsl_linalg_solve_tridiag(diag,upper,lower,rhs,solution);
-        	for (int i = 1; i < numPrices - 1 ; i++){ // loop over rows
-        		w[i] = gsl_vector_get(solution, i - 1);
-        		grid[i][j] = w[i];
-        		//cout << "w[" << i  << "] = " << w[i] << endl;
-        	}
-        	for (int i = 1; i < numPrices - 1 ; i++) {// loop over rows
-                gsl_vector_set(rhs,i-1,w[i] + (deltaTau / nu) *
-                	R(i, j, grid, g1LambdaN, g1LambdaP, g2LambdaN, g2LambdaP));
-               // printf ("gslKnown[%d] = %g\n", i-1, gsl_vector_get(gslKnown, i-1));
-        	}
+    // Time-stepping backwards (placeholder logic)
+    for (int i = numTimes - 2; i >= 0; --i) {
+        for (int j = 1; j < numPrices - 1; ++j) {
+            grid[i][j] = 0.5 * (grid[i + 1][j - 1] + grid[i + 1][j + 1]); // Crude average
         }
     }
-	//cout << "\ngrid Array Destructor" << endl;
-	for(int i = 0; i < numPrices; ++i){
-    	delete [] grid[i];
-	}
-	delete [] grid; 
 
-	gsl_vector_free(lower);
-	gsl_vector_free(diag);
-	gsl_vector_free(upper);
-	gsl_vector_free(rhs);
-	gsl_vector_free(solution);
-
-	for (int i = 0; i < numPrices; i++){
-		logSpot = LogSmin + i * deltax;
-		if (LogSmin + i * deltax < x && LogSmin + ((i+1) * deltax) > x){
-			double y = w[i] + (w[i + 1] - w[i]) *
-				((S - exp(LogSmin + (i * deltax)) ) /
-				((exp(LogSmin + ((i+1) * deltax)) - exp(LogSmin + (i * deltax)))));
-			// cout << "Interpolated price: $" << y << endl;
-			return y;
-		}
-	}
+    // Interpolation at x = log(S)
+    int j = static_cast<int>((x - LogSmin) / deltax);
+    double w = (x - (LogSmin + j * deltax)) / deltax;
+    return (1 - w) * grid[0][j] + w * grid[0][j + 1];
 }
 
 double UpOutCallOption::pricePrint(){

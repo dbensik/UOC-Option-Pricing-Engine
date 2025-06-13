@@ -1,17 +1,13 @@
-// CustomTridiagonalSolver.hpp
-#ifndef CUSTOM_TRIDIAGONAL_SOLVER_HPP
-#define CUSTOM_TRIDIAGONAL_SOLVER_HPP
+// CustomerTridiagonalSolver.hpp
+#ifndef CUSTOMERTRIDIAGONALSOLVER_HPP
+#define CUSTOMERTRIDIAGONALSOLVER_HPP
 
 #include "TridiagonalSolverBase.hpp"
+#include <vector>
 
-class CustomTridiagonalSolver : public TridiagonalSolverBase {
+class CustomerTridiagonalSolver : public TridiagonalSolverBase {
 public:
-    std::vector<double> solve(
-        const std::vector<double>& a,
-        const std::vector<double>& b,
-        const std::vector<double>& c,
-        const std::vector<double>& rhs
-    ) const override;
+    std::vector<double> solve(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c, const std::vector<double>& d) override;
 };
 
-#endif // CUSTOM_TRIDIAGONAL_SOLVER_HPP
+#endif // CUSTOMERTRIDIAGONALSOLVER_HPP

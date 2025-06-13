@@ -26,6 +26,7 @@
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_complex_math.h>
 #include <gsl/gsl_linalg.h>
+#include "pricing/TridiagonalSolverBase.hpp"
 
 using namespace std;
 
@@ -69,6 +70,10 @@ public:
     double pricePrint();
     double payoff(double S) const;
     void writeCSV(double **array) const;
+
+    TridiagonalSolverBase* solver; // raw pointer or smart, depending on how grown-up you're feeling
+    
+    void setSolver(TridiagonalSolverBase* s);
 };
 
 #endif

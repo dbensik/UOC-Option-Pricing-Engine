@@ -1,101 +1,73 @@
-# UOC Option Pricing Engine 🧠📈
-This C++ project is an academic-grade implementation of an Up-and-Out Call Option pricing engine, built to solve a Partial Integro-Differential Equation (PIDE) using finite difference methods and tridiagonal solvers. In short: it’s a bunch of math that spits out the price of fancy financial derivatives while giving your CPU a mild workout.
+# 🧨 UOC Option Pricing Engine
+Welcome to the thrilling world of Up-and-Out Call Option Pricing, where we simulate financial instruments with the same elegance as a 10-year-old learning to rollerblade. This project uses finite difference methods under a jump-diffusion model to price exotic options that normal people don’t understand and even fewer should trade.
 
-## 💡 Purpose
-The model implements:
-
-* A finite difference scheme to numerically solve the PIDE
-
-* Support for parameterized option characteristics (strike, barrier, etc.)
-
-* Market-model calibration using:
-
-* Grid search
-
-* Nelder-Mead simplex optimization (via GSL)
-
-* Output via CSV for 3D surface plotting
-
-* Runtime metrics, because you deserve to know how long it took
-
-## 🧰 Features
-* PIDE solver with tridiagonal matrix linear algebra
-
-* GSL-backed numerical routines
-
-* Multiple constructors for flexible model configuration
-
-* Market calibration routines
-
-* Full debugging output (opt-in if you like pain)
-
-* Structured modularity (finally)
-
-* Runtime profiling (Ali Hirsa style)
-
-## 📦 Project Structure
+## 📦 Contents
 ```bash
-.
-├── TestUoc.cpp         # Main driver file with I/O and runtime logic
-├── uocOption.hpp/cpp   # Main option class with pricing engine and solver logic
-├── optimizer.hpp/cpp   # Optimizers, grid search, Nelder-Mead, evaluation tools
-├── Makefile            # Use pkg-config to compile with GSL
-└── README.md           # The thing you're reading
+src/
+├── core/                    # Where your option logic lives, free of emotion
+├── pricing/                # Tridiagonal solvers because diagonals aren't enough
+├── utils/                  # Math that makes your high school teacher cry
+main.cpp                    # Just enough to run something, barely
+Makefile                   # You still have to type 'make', sorry
 ```
 
-## 🧪 Dependencies
-* C++11 or later
+## 🛠 Requirements
+- g++ (C++17, because we have standards now)
 
-* GSL (GNU Scientific Library)
+- GSL (libgsl-dev, install it like a grown-up)
 
-* A functioning brain (optional but recommended)
+- OpenMP (optional, for people who want results today)
 
-🧰 Building the Project
+## 🚀 Build It Like You Mean It
 ```bash
-g++ $(pkg-config --cflags gsl) -c TestUoc.cpp uocOption.cpp optimizer.cpp
-g++ TestUoc.o uocOption.o optimizer.o $(pkg-config --libs gsl) -o TestUoc
-./TestUoc
+make
 ```
 
-## 🎮 Usage
-1. Run the executable.
+Try not to blink. It might just compile.
 
-2. Follow the prompts to:
+## 🧪 Try It Out
+Run the binary. If you see a price, congratulations. If not, well... that's what debuggers are for.
+```bash
+./main
+```
+Or write your own tests. I believe in you, kind of.
 
-      * Price a sample option.
+## 💡 Features
+- Choose between a home-brewed tridiagonal solver or the GSL version because variety is the spice of bugs.
 
-      * Generate a pricing grid.
+- Handles jumps, diffusions, and your hopes and dreams.
 
-      * Run Nelder-Mead optimization to calibrate parameters to market data.
+- Mesh-based solution grid so dense it should probably file taxes.
 
-  3. Watch the output and CSV files rain down.
+- Helper math functions that require external libraries and maybe a prayer.
 
-## 📈 Output
-* Terminal output includes intermediate and final option prices.
+## 🧹 Clean Up
+```bash
+make clean
+```
 
-* A surface.csv file is generated for 3D surface plotting.
+Deletes your hopes, dreams, and the bin/ directory.
 
-## 🧪 Test Cases
-Several hard-coded configurations simulate pricing across strike-barrier matrices and known test values. You’ll be prompted to run:
+## 📌 Notes
+- This is for academic and recreational pain only.
 
-  * Grid search calibration
+- Expect performance to vary depending on whether your machine is powered by coffee or despair.
 
-  * Nelder-Mead optimization (type 1 or 2)
+- Y ∈ [0, 1). Outside that, we throw runtime errors like candy.
 
-  * Output model and market prices
+## 🫠 Here's What I Regret
+- Not wrapping GslTridiagonalSolver in a sanity-checking decorator. Trusting a black-box numerical library with your money is like handing your keys to a raccoon because it looked confident.
 
-## ❓ FAQ (aka stuff you may ask eventually)
-**Q: Can I use this in production?**
+- Assuming Y will behave. Y is supposed to be in [0,1), but will silently betray you the moment you get cocky.
 
-A: Unless your production is a grad school thesis, please don't. This is a teaching engine.
+- Hardcoding grid sizes. I mean, yeah, it works, but adjusting the mesh should feel less like diffusing a bomb.
 
-**Q: Is the PIDE method better than Monte Carlo?**
+- Storing parameters in vectors like it’s 2004. params[3] is... wait, is that Y? Or is it theta? Don’t lie, you’ve guessed before.
 
-A: Depends. This is deterministic and generally faster for vanilla options. MC is more flexible but slower.
+- Calling init() in constructors like a nervous tic. One day, someone’s going to forget and everything’s going to default to $S = 100 because we didn’t believe in configuration files.
 
-**Q: Why are there so many constructors in uocOption?**
+- Debug printouts as if we’re running a fax machine. dumpPrint() is cute until it starts gaslighting you.
 
-A: Because the past is a foreign country where people do things differently, and constructors were cheap.
+- Not testing both solvers under duress. Sure, they work... until they don’t, and suddenly you’re pricing negative options.
 
-## 🧠 Author
-Project and code by @dbensik.
+- Using cmath without checking for domain errors. Mathematically undefined behavior is just code with extra vibes.

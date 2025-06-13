@@ -4,7 +4,7 @@ CXXFLAGS = -Wall -Wextra -O2 -std=c++11 -fopenmp -g
 LDFLAGS = -lgsl -lgslcblas -ldl
 
 # Source files and objects
-SRCS = TestUoc.cpp uocOption.cpp optimizer.cpp
+SRCS = TestUoc.cpp UpOutCallOption.cpp optimizer.cpp
 OBJS = $(SRCS:.cpp=.o)
 TARGET = TestUoc.out
 

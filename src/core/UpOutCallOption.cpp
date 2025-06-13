@@ -1,36 +1,36 @@
-
-#ifndef UpOutCallOption_cpp
-#define UpOutCallOption_cpp
-
+// UpOutCallOption.cpp
 #include "UpOutCallOption.hpp"
-#include "pricing/TridiagonalSolver.hpp"
+#include "pricing/TridiagonalSolverBase.hpp"
 #include "utils/MathUtils.hpp"
+
 #include <tuple>
 
 using std::vector;
 using std::cout;
 using std::endl;
 
-UpOutCallOption::UpOutCallOption() {
+UpOutCallOption::UpOutCallOption(TridiagonalSolverBase* solver)
+    : solver(solver) {
     init();
 }
 
-UpOutCallOption::UpOutCallOption(double K, double B, double sigma, double nu, double theta, double Y)
-    : K(K), B(B), sigma(sigma), nu(nu), theta(theta), Y(Y) {
+UpOutCallOption::UpOutCallOption(double K, double B, double sigma, double nu, double theta, double Y, TridiagonalSolverBase* solver)
+    : K(K), B(B), sigma(sigma), nu(nu), theta(theta), Y(Y), solver(solver) {
     init();
 }
 
-UpOutCallOption::UpOutCallOption(double sigma, double nu, double theta, double Y)
-    : sigma(sigma), nu(nu), theta(theta), Y(Y) {
+UpOutCallOption::UpOutCallOption(double sigma, double nu, double theta, double Y, TridiagonalSolverBase* solver)
+    : sigma(sigma), nu(nu), theta(theta), Y(Y), solver(solver) {
     init();
 }
 
-UpOutCallOption::UpOutCallOption(double strike, double barrier, const vector<double>& params)
-    : K(strike), B(barrier), sigma(params[0]), nu(params[1]), theta(params[2]), Y(params[3]) {
+UpOutCallOption::UpOutCallOption(double strike, double barrier, const vector<double>& params, TridiagonalSolverBase* solver)
+    : K(strike), B(barrier), sigma(params[0]), nu(params[1]), theta(params[2]), Y(params[3]), solver(solver) {
     init();
 }
 
-UpOutCallOption::UpOutCallOption(const UpOutCallOption& option2) {
+UpOutCallOption::UpOutCallOption(const UpOutCallOption& option2)
+    : solver(option2.solver) {
     copy(option2);
 }
 
@@ -38,13 +38,10 @@ UpOutCallOption::~UpOutCallOption() {}
 
 UpOutCallOption& UpOutCallOption::operator=(const UpOutCallOption& option2) {
     if (this != &option2) {
+        solver = option2.solver;
         copy(option2);
     }
     return *this;
-}
-
-void UpOutCallOption::setSolver(TridiagonalSolverBase* s) {
-    solver = s;
 }
 
 void UpOutCallOption::init() {
@@ -62,10 +59,13 @@ void UpOutCallOption::init() {
     lambdaN = MathUtils::lambdaN(theta, sigma, nu);
     lambdaP = MathUtils::lambdaP(theta, sigma, nu);
 
-    Bl = ((MathUtils::sigma2(sigma, deltax, Y) * deltaTau) / (2 * deltax * deltax)) - 
-         (r - q + MathUtils::omega(sigma, theta, nu, deltax, Y) - 0.5 * MathUtils::sigma2(sigma, deltax, Y)) * (deltaTau / (2 * deltax));
-    Bu = ((MathUtils::sigma2(sigma, deltax, Y) * deltaTau) / (2 * deltax * deltax)) + 
-         (r - q + MathUtils::omega(sigma, theta, nu, deltax, Y) - 0.5 * MathUtils::sigma2(sigma, deltax, Y)) * (deltaTau / (2 * deltax));
+    double sigma2Val = MathUtils::sigma2(lambdaN, lambdaP, deltax, nu, Y);
+    double omegaVal = MathUtils::omega(lambdaN, lambdaP, nu, deltax, Y);
+
+    Bl = ((sigma2Val * deltaTau) / (2 * deltax * deltax)) - 
+         (r - q + omegaVal - 0.5 * sigma2Val) * (deltaTau / (2 * deltax));
+    Bu = ((sigma2Val * deltaTau) / (2 * deltax * deltax)) + 
+         (r - q + omegaVal - 0.5 * sigma2Val) * (deltaTau / (2 * deltax));
 }
 
 void UpOutCallOption::copy(const UpOutCallOption& o2) {
@@ -91,7 +91,6 @@ void UpOutCallOption::dumpPrint() {
     cout << "Coefficients -> Bl: " << Bl << ", Bu: " << Bu << endl;
 }
 
-// Updated price method with TridiagonalSolver
 double UpOutCallOption::price() {
     vector<vector<double>> grid(numTimes, vector<double>(numPrices, 0.0));
 
@@ -106,8 +105,6 @@ double UpOutCallOption::price() {
         grid[i][numPrices - 1] = 0.0;
     }
 
-    if (!solver) throw std::runtime_error("Solver not set for UpOutCallOption.");
-    
     vector<double> a(numPrices - 2), b(numPrices - 2), c(numPrices - 2), rhs(numPrices - 2);
 
     for (int i = numTimes - 2; i >= 0; --i) {
@@ -128,8 +125,3 @@ double UpOutCallOption::price() {
     double w = (x - (LogSmin + j * deltax)) / deltax;
     return (1 - w) * grid[0][j] + w * grid[0][j + 1];
 }
-
-void UpOutCallOption::setSolver(TridiagonalSolverBase* s) {
-    solver = s;
-}
-

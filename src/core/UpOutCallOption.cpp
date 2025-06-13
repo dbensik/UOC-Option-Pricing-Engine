@@ -1,17 +1,18 @@
 
-#ifndef uocOption_cpp
-#define uocOption_cpp
+#ifndef UpOutCallOption_cpp
+#define UpOutCallOption_cpp
 
 #include "UpOutCallOption.hpp"
+#include <tuple>
 
 /////////////////////////////////////////////////////////////////////////////////////
-void uocOption::init() { // Default call option
-	cout << "Inside uocOption::init()" << endl;
+void UpOutCallOption::init() { // Default call option
+	cout << "Inside UpOutCallOption::init()" << endl;
 	//init();
 }
 
-uocOption::uocOption(){	// Initialise all default values
-	//cout << "Inside uocOption::uocOption()" << endl;
+UpOutCallOption::UpOutCallOption(){	// Initialise all default values
+	//cout << "Inside UpOutCallOption::UpOutCallOption()" << endl;
 	S = 1950;  // Initial stock price
 	x = log(S); // Initial log price
 	K = 2050;  // Strike price
@@ -40,18 +41,18 @@ uocOption::uocOption(){	// Initialise all default values
 	lambdaP = sqrt((pow(theta,2)/pow(sigma,4))
 		+(2/(sigma * sigma * nu))) - theta/(sigma * sigma);
 
-	Bl = ((uocOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) - 
-		(r - q + uocOption::omega(deltax) - 0.5 * uocOption::sigma2(deltax))
+	Bl = ((UpOutCallOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) - 
+		(r - q + UpOutCallOption::omega(deltax) - 0.5 * UpOutCallOption::sigma2(deltax))
 		 * (deltaTau / (2 * deltax));
 	
-	Bu = ((uocOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) + 
-		(r - q + uocOption::omega(deltax) - 0.5 * uocOption::sigma2(deltax))
+	Bu = ((UpOutCallOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) + 
+		(r - q + UpOutCallOption::omega(deltax) - 0.5 * UpOutCallOption::sigma2(deltax))
 		 * (deltaTau / (2 * deltax));
 }
 
-uocOption::uocOption(const double strike, const double barrier, const double sigmaParam, 
+UpOutCallOption::UpOutCallOption(const double strike, const double barrier, const double sigmaParam, 
 	const double nuParam, const double thetaParam, const double YParam){
-    //cout << "uocOption Constructor with parameters" << endl;
+    //cout << "UpOutCallOption Constructor with parameters" << endl;
     S = 100;  // Initial stock price
 	x = log(S); // Initial log price
 	K = strike;  // Strike price
@@ -80,18 +81,18 @@ uocOption::uocOption(const double strike, const double barrier, const double sig
 	lambdaP = sqrt((pow(theta,2)/pow(sigma,4))
 		+(2/(sigma * sigma * nu))) - theta/(sigma * sigma);
 
-	Bl = ((uocOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) - 
-		(r - q + uocOption::omega(deltax) - 0.5 * uocOption::sigma2(deltax))
+	Bl = ((UpOutCallOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) - 
+		(r - q + UpOutCallOption::omega(deltax) - 0.5 * UpOutCallOption::sigma2(deltax))
 		 * (deltaTau / (2 * deltax));
 	
-	Bu = ((uocOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) + 
-		(r - q + uocOption::omega(deltax) - 0.5 * uocOption::sigma2(deltax))
+	Bu = ((UpOutCallOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) + 
+		(r - q + UpOutCallOption::omega(deltax) - 0.5 * UpOutCallOption::sigma2(deltax))
 		 * (deltaTau / (2 * deltax));  
 }
 
-uocOption::uocOption(const double sigmaParam, const double nuParam,
+UpOutCallOption::UpOutCallOption(const double sigmaParam, const double nuParam,
 	const double thetaParam, const double YParam){
-    //cout << "uocOption Constructor with parameters" << endl;
+    //cout << "UpOutCallOption Constructor with parameters" << endl;
     S = 100;  // Initial stock price
 	x = log(S); // Initial log price
 	K = 100;  // Strike price
@@ -120,17 +121,17 @@ uocOption::uocOption(const double sigmaParam, const double nuParam,
 	lambdaP = sqrt((pow(theta,2)/pow(sigma,4))
 		+(2/(sigma * sigma * nu))) - theta/(sigma * sigma);
 
-	Bl = ((uocOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) - 
-		(r - q + uocOption::omega(deltax) - 0.5 * uocOption::sigma2(deltax))
+	Bl = ((UpOutCallOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) - 
+		(r - q + UpOutCallOption::omega(deltax) - 0.5 * UpOutCallOption::sigma2(deltax))
 		 * (deltaTau / (2 * deltax));
 	
-	Bu = ((uocOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) + 
-		(r - q + uocOption::omega(deltax) - 0.5 * uocOption::sigma2(deltax))
+	Bu = ((UpOutCallOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) + 
+		(r - q + UpOutCallOption::omega(deltax) - 0.5 * UpOutCallOption::sigma2(deltax))
 		 * (deltaTau / (2 * deltax));  
 }
 
-uocOption::uocOption(const double strike, const double barrier, const vector<double>& params){
-    //cout << "uocOption Constructor with parameter array" << endl;
+UpOutCallOption::UpOutCallOption(const double strike, const double barrier, const vector<double>& params){
+    //cout << "UpOutCallOption Constructor with parameter array" << endl;
     S = 100;  // Initial stock price
 	x = log(S); // Initial log price
 	K = strike;  // Strike price
@@ -159,16 +160,16 @@ uocOption::uocOption(const double strike, const double barrier, const vector<dou
 	lambdaP = sqrt((pow(theta,2)/pow(sigma,4))
 		+(2/(sigma * sigma * nu))) - theta/(sigma * sigma);
 
-	Bl = ((uocOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) - 
-		(r - q + uocOption::omega(deltax) - 0.5 * uocOption::sigma2(deltax))
+	Bl = ((UpOutCallOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) - 
+		(r - q + UpOutCallOption::omega(deltax) - 0.5 * UpOutCallOption::sigma2(deltax))
 		 * (deltaTau / (2 * deltax));
 	
-	Bu = ((uocOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) + 
-		(r - q + uocOption::omega(deltax) - 0.5 * uocOption::sigma2(deltax))
+	Bu = ((UpOutCallOption::sigma2(deltax) * deltaTau) / (2 * deltax * deltax)) + 
+		(r - q + UpOutCallOption::omega(deltax) - 0.5 * UpOutCallOption::sigma2(deltax))
 		 * (deltaTau / (2 * deltax));  
 }
 
-void uocOption::copy(const uocOption& o2){
+void UpOutCallOption::copy(const UpOutCallOption& o2){
 	S = o2.S;  // Initial stock price
 	x = o2.x;
 	K = o2.K;  // Strike price
@@ -198,23 +199,23 @@ void uocOption::copy(const uocOption& o2){
 	Bu = o2.Bu;	
 }
 
-uocOption::uocOption(const uocOption& o2){ // Copy constructor
-	cout << "uocOption copy constructor" << endl;
+UpOutCallOption::UpOutCallOption(const UpOutCallOption& o2){ // Copy constructor
+	cout << "UpOutCallOption copy constructor" << endl;
 	copy(o2);
 }
 
-uocOption::~uocOption() {
-	//cout << "uocOption destructor" << endl;
+UpOutCallOption::~UpOutCallOption() {
+	//cout << "UpOutCallOption destructor" << endl;
 	//cout << endl;// Virual Destructor
 }
 
-uocOption& uocOption::operator = (const uocOption& option2) {
+UpOutCallOption& UpOutCallOption::operator = (const UpOutCallOption& option2) {
 	if (this == &option2) return *this;
 	copy (option2);
 	return *this;
 }
 
-void uocOption::dumpPrint() {
+void UpOutCallOption::dumpPrint() {
 	cout << "\nStock price is $" << S << endl;
 	cout << "Log Stock price is $" << x << endl;
 	cout << "Strike price is $" << K << endl;
@@ -254,7 +255,7 @@ void uocOption::dumpPrint() {
 	cout << endl;
 }
 
-void uocOption::printGrid(double **array) const {
+void UpOutCallOption::printGrid(double **array) const {
 	cout << endl;
 	for (int i = 0 ; i < numPrices; i++) {// loop over rows
         for (int j = 0; j < numTimes; j++) {// loop over cols
@@ -265,7 +266,7 @@ void uocOption::printGrid(double **array) const {
     cout << endl;
 }
 
-void uocOption::writeCSV(double **array) const {
+void UpOutCallOption::writeCSV(double **array) const {
 	//gettimeofday(&startTime, NULL); 
 	//FILE *surface;
 	ofstream surface ("surface.csv"); 
@@ -295,13 +296,38 @@ void uocOption::writeCSV(double **array) const {
 	surface.close();
 }
 
-double uocOption::price(){
+std::tuple<gsl_vector*, gsl_vector*, gsl_vector*, gsl_vector*, gsl_vector*>
+UpOutCallOption::initializeGslVectors(int gslDim) {
+    gsl_vector* lower = gsl_vector_alloc(gslDim - 1);
+    gsl_vector* diag = gsl_vector_alloc(gslDim);
+    gsl_vector* upper = gsl_vector_alloc(gslDim - 1);
+    gsl_vector* rhs = gsl_vector_alloc(gslDim);
+    gsl_vector* solution = gsl_vector_alloc(gslDim);
+
+    gsl_vector_set_all(lower, 0.0);
+    gsl_vector_set_all(diag, 0.0);
+    gsl_vector_set_all(upper, 0.0);
+    gsl_vector_set_all(rhs, 0.0);
+    gsl_vector_set_all(solution, 0.0);
+
+    return std::make_tuple(lower, diag, upper, rhs, solution);
+}
+
+void uocOption::computeGVectors(std::vector<double>& g1LambdaN,
+                                 std::vector<double>& g1LambdaP,
+                                 std::vector<double>& g2LambdaN,
+                                 std::vector<double>& g2LambdaP) const {
+    for(int i = 0; i <= numPrices - 2; ++i) {
+        g1LambdaN[i] = g1(Y, (i + 1) * deltax * lambdaN);
+        g1LambdaP[i] = g1(Y, (i + 1) * deltax * lambdaP);
+        g2LambdaN[i] = g2(Y, (i + 1) * deltax * lambdaN);
+        g2LambdaP[i] = g2(Y, (i + 1) * deltax * lambdaP);
+    }
+}
+
+double UpOutCallOption::price(){
     int gslDim = numPrices - 2;
-    gsl_vector *lower = gsl_vector_alloc (gslDim - 1); gsl_vector_set_all (lower, 0.0);
-    gsl_vector *diag = gsl_vector_alloc (gslDim); gsl_vector_set_all (diag, 0.0);
-    gsl_vector *upper = gsl_vector_alloc (gslDim - 1); gsl_vector_set_all (upper, 0.0);
-    gsl_vector *rhs = gsl_vector_alloc (gslDim); gsl_vector_set_all (rhs, 0.0);
-    gsl_vector *solution = gsl_vector_alloc (gslDim); gsl_vector_set_all (solution, 0.0);
+    auto [lower, diag, upper, rhs, solution] = initializeGslVectors(gslDim);
 
     for (int i = 0; i < gslDim - 1; i++) {
         gsl_vector_set(lower, i, l());
@@ -326,52 +352,13 @@ double uocOption::price(){
     
     vector<double> w(numPrices,0.0);
 
-	/*	Calculates GSL G Vectors
-	    gsl_vector *gslG1LambdaN, *gslG1LambdaP, *gslG2LambdaN, *gslG2LambdaP;
-	    
-	    gslG1LambdaN = gsl_vector_alloc (numPrices - 1);
-	    gslG1LambdaP = gsl_vector_alloc (numPrices - 1);
-	    gslG2LambdaN = gsl_vector_alloc (numPrices - 1);
-	    gslG2LambdaP = gsl_vector_alloc (numPrices - 1);
 
-	    gsl_vector_set_zero(gslG1LambdaN);
-	    gsl_vector_set_zero(gslG1LambdaP);
-	    gsl_vector_set_zero(gslG2LambdaN);
-	    gsl_vector_set_zero(gslG2LambdaP);
-	*/
+    	std::vector<double> g1LambdaN(numPrices - 1, 0.0);
+    	std::vector<double> g1LambdaP(numPrices - 1, 0.0);
+    	std::vector<double> g2LambdaN(numPrices - 1, 0.0);
+   	std::vector<double> g2LambdaP(numPrices - 1, 0.0);
+    	computeGVectors(g1LambdaN, g1LambdaP, g2LambdaN, g2LambdaP);
 
-    vector<double> g1LambdaN(numPrices - 1, 0.0);
-    vector<double> g1LambdaP(numPrices - 1, 0.0);
-    vector<double> g2LambdaN(numPrices - 1, 0.0);
-    vector<double> g2LambdaP(numPrices - 1, 0.0);
-    
-    for(int i = 0; i <= numPrices - 2; i++)  {// G vectors
-    
-        g1LambdaN[i] = g1(Y,(i+1) * deltax * lambdaN);
-        //gsl_vector_set(gslG1LambdaN, i, g1(Y,(i+1) * deltax * lambdaN));
-        //cout << "g1LambdaN[" << i << "] = " << g1LambdaN[i] << endl;
-        //printf ("gslG1LambdaN[%d] = %g\n", i, gsl_vector_get (gslG1LambdaN, i));
-        //cout << "g1(Y, " << i << " *deltax*lambdaN) = " << g1(Y, (i+1) * deltax * lambdaN) << endl;
-
-        g1LambdaP[i] = g1(Y,(i+1) * deltax * lambdaP);
-        //gsl_vector_set(gslG1LambdaP, i, g1(Y,(i+1) * deltax * lambdaP));
-        //cout << "g1LambdaP[" << i << "] = " << g1LambdaP[i] << endl;
-        //printf ("gslG1LambdaP[%d] = %g\n", i, gsl_vector_get (gslG1LambdaP, i));
-        //cout << "g1(Y, " << i << " *deltax*lambdaP) = " << g1(Y, (i+1) * deltax * lambdaP) << endl;
-
-        g2LambdaN[i] = g2(Y,(i+1) * deltax * lambdaN);
-        //gsl_vector_set(gslG2LambdaN, i, g2(Y,(i+1) * deltax * lambdaN));
-        //cout << "g2LambdaN[" << i << "] = " << g2LambdaN[i] << endl;
-        //printf ("gslG2LambdaN[%d] = %g\n", i, gsl_vector_get (gslG2LambdaN, i));
-        //cout << "g2(Y, " << i << " *deltax*lambdaN) = " << g2(Y, (i+1) * deltax * lambdaN) << endl;
-
-        g2LambdaP[i] = g2(Y,(i+1) * deltax * lambdaP);
-        //gsl_vector_set(gslG2LambdaP, i, g2(Y,(i+1) * deltax * lambdaP));
-        //cout << "g2LambdaP[" << i << "] = " << g2LambdaP[i] << endl;
-        //printf ("gslG2LambdaP[%d] = %g\n", i, gsl_vector_get (gslG2LambdaP, i));
-        //cout << "g2(Y, " << i << " *deltax*lambdaP) = " << g2(Y, (i+1) * deltax * lambdaP) << endl;
-    }
-	
 	double **grid = new double*[numPrices];
 	for (int i = 0; i < numPrices; ++i){
 		grid[i] = new double[numTimes];
@@ -437,7 +424,7 @@ double uocOption::price(){
 	}
 }
 
-double uocOption::pricePrint(){
+double UpOutCallOption::pricePrint(){
     int gslDim = numPrices - 2;
     gsl_vector *lower = gsl_vector_alloc (gslDim - 1); gsl_vector_set_all (lower, 0.0);
     gsl_vector *diag = gsl_vector_alloc (gslDim); gsl_vector_set_all (diag, 0.0);
@@ -587,12 +574,12 @@ double uocOption::pricePrint(){
 	}
 }
 
-double uocOption::payoff(double x) const {
+double UpOutCallOption::payoff(double x) const {
 	
 	return  max(exp(x) - K, 0.0);
 }
 
-double uocOption::R(int i, int j, double **array, 
+double UpOutCallOption::R(int i, int j, double **array, 
 	const vector<double>& g1LambdaN, const vector<double>& g1LambdaP,
 	const vector<double>& g2LambdaN, const vector<double>& g2LambdaP) {
 
@@ -630,25 +617,25 @@ double uocOption::R(int i, int j, double **array,
 	return totalSum;
 }
 
-double uocOption::sigma2(double epsilon) {
+double UpOutCallOption::sigma2(double epsilon) {
 	double result =  ((1 / nu) * pow(lambdaP,Y-2)) * (-1*(pow(lambdaP * epsilon,1-Y) *
-		exp(-1 * lambdaP * epsilon)) + ((1 - Y) * (uocOption::g1(Y,0) - 
-		uocOption::g1(Y,lambdaP * epsilon)))) + ((1 / nu) * pow(lambdaN,Y-2)) *
+		exp(-1 * lambdaP * epsilon)) + ((1 - Y) * (UpOutCallOption::g1(Y,0) - 
+		UpOutCallOption::g1(Y,lambdaP * epsilon)))) + ((1 / nu) * pow(lambdaN,Y-2)) *
 		(-1*(pow(lambdaN * epsilon,1-Y) *
-		exp(-1*lambdaN * epsilon)) + ((1 - Y) * (uocOption::g1(Y,0) - 
-		uocOption::g1(Y,lambdaN * epsilon)))) ;
+		exp(-1*lambdaN * epsilon)) + ((1 - Y) * (UpOutCallOption::g1(Y,0) - 
+		UpOutCallOption::g1(Y,lambdaN * epsilon)))) ;
 	return result;
 }
 
-double uocOption::omega(double epsilon) {
-	double result =  (((pow(lambdaP,Y))/nu) * uocOption::g2(Y,lambdaP * epsilon)) - 
-		(((pow(lambdaP-1,Y))/nu) * uocOption::g2(Y,(lambdaP-1) * epsilon)) + 
-		(((pow(lambdaN,Y))/nu) * uocOption::g2(Y,lambdaN * epsilon)) - 
-		(((pow(lambdaN + 1,Y))/nu) * uocOption::g2(Y,(lambdaN + 1) * epsilon));
+double UpOutCallOption::omega(double epsilon) {
+	double result =  (((pow(lambdaP,Y))/nu) * UpOutCallOption::g2(Y,lambdaP * epsilon)) - 
+		(((pow(lambdaP-1,Y))/nu) * UpOutCallOption::g2(Y,(lambdaP-1) * epsilon)) + 
+		(((pow(lambdaN,Y))/nu) * UpOutCallOption::g2(Y,lambdaN * epsilon)) - 
+		(((pow(lambdaN + 1,Y))/nu) * UpOutCallOption::g2(Y,(lambdaN + 1) * epsilon));
 	return result;
 }
 
-double uocOption::g1(double Y, double x) {
+double UpOutCallOption::g1(double Y, double x) {
     if (Y == 0)
         return exp(-x);
     else if (Y > 0 && Y < 1)
@@ -659,7 +646,7 @@ double uocOption::g1(double Y, double x) {
     }
 }
 
-double uocOption::g2(double Y, double x) {
+double UpOutCallOption::g2(double Y, double x) {
     if (Y == 0)
         return gsl_sf_expint_E1(x);
     else if (Y > 0 && Y < 1)
@@ -670,18 +657,18 @@ double uocOption::g2(double Y, double x) {
     }
 }
 
-double uocOption::l(){
+double UpOutCallOption::l(){
 	
 	return -1 * Bl;
 }  
 
-double uocOption::d(int i){
+double UpOutCallOption::d(int i){
 	return 1 + r * deltaTau + Bl + Bu + deltaTau/nu * (((pow(lambdaN,Y)) * 
 		(g2(Y,i * deltax * lambdaN))) + (pow(lambdaP,Y) * g2(Y,(numPrices-i) *
 		deltax * lambdaP )));
 }
 
-double uocOption::u(){
+double UpOutCallOption::u(){
 	
 	return -1 * Bu;
 }

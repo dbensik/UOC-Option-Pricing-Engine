@@ -43,6 +43,10 @@ UpOutCallOption& UpOutCallOption::operator=(const UpOutCallOption& option2) {
     return *this;
 }
 
+void UpOutCallOption::setSolver(TridiagonalSolverBase* s) {
+    solver = s;
+}
+
 void UpOutCallOption::init() {
     S = 100; x = log(S);
     LogK = log(K);
@@ -102,7 +106,8 @@ double UpOutCallOption::price() {
         grid[i][numPrices - 1] = 0.0;
     }
 
-    TridiagonalSolver solver;
+    if (!solver) throw std::runtime_error("Solver not set for UpOutCallOption.");
+    
     vector<double> a(numPrices - 2), b(numPrices - 2), c(numPrices - 2), rhs(numPrices - 2);
 
     for (int i = numTimes - 2; i >= 0; --i) {
@@ -113,7 +118,7 @@ double UpOutCallOption::price() {
             rhs[j - 1] = grid[i + 1][j];
         }
 
-        vector<double> solution = solver.solve(a, b, c, rhs);
+        vector<double> solution = solver->solve(a, b, c, rhs);
         for (int j = 1; j < numPrices - 1; ++j) {
             grid[i][j] = solution[j - 1];
         }
@@ -123,3 +128,8 @@ double UpOutCallOption::price() {
     double w = (x - (LogSmin + j * deltax)) / deltax;
     return (1 - w) * grid[0][j] + w * grid[0][j + 1];
 }
+
+void UpOutCallOption::setSolver(TridiagonalSolverBase* s) {
+    solver = s;
+}
+

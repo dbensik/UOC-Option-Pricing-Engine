@@ -1,28 +1,25 @@
-// CustomTridiagonalSolver.cpp
-#include "CustomTridiagonalSolver.hpp"
-#include <vector>
+// CustomerTridiagonalSolver.cpp
+#include "CustomerTridiagonalSolver.hpp"
+#include <stdexcept>
 
-std::vector<double> CustomTridiagonalSolver::solve(
-    const std::vector<double>& a,
-    const std::vector<double>& b,
-    const std::vector<double>& c,
-    const std::vector<double>& rhs
-) const {
-    int n = rhs.size();
-    std::vector<double> x(n), c_prime(n), d_prime(n);
+std::vector<double> CustomerTridiagonalSolver::solve(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c, const std::vector<double>& d) {
+    int n = d.size();
+    std::vector<double> cp(n), dp(n), x(n);
 
-    c_prime[0] = c[0] / b[0];
-    d_prime[0] = rhs[0] / b[0];
+    if (b[0] == 0.0) throw std::runtime_error("Division by zero in Thomas algorithm");
+    cp[0] = c[0] / b[0];
+    dp[0] = d[0] / b[0];
 
     for (int i = 1; i < n; ++i) {
-        double m = b[i] - a[i - 1] * c_prime[i - 1];
-        c_prime[i] = c[i] / m;
-        d_prime[i] = (rhs[i] - a[i - 1] * d_prime[i - 1]) / m;
+        double m = b[i] - a[i - 1] * cp[i - 1];
+        if (m == 0.0) throw std::runtime_error("Division by zero in Thomas algorithm");
+        cp[i] = c[i] / m;
+        dp[i] = (d[i] - a[i - 1] * dp[i - 1]) / m;
     }
 
-    x[n - 1] = d_prime[n - 1];
+    x[n - 1] = dp[n - 1];
     for (int i = n - 2; i >= 0; --i) {
-        x[i] = d_prime[i] - c_prime[i] * x[i + 1];
+        x[i] = dp[i] - cp[i] * x[i + 1];
     }
 
     return x;

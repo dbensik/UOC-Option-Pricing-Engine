@@ -1,3 +1,4 @@
+// TridiagonalSolverBase.hpp
 #ifndef TRIDIAGONAL_SOLVER_BASE_HPP
 #define TRIDIAGONAL_SOLVER_BASE_HPP
 
@@ -5,14 +6,13 @@
 
 class TridiagonalSolverBase {
 public:
-    virtual ~TridiagonalSolverBase() = default;
-
+    virtual ~TridiagonalSolverBase() {}
     virtual std::vector<double> solve(
         const std::vector<double>& a,
         const std::vector<double>& b,
         const std::vector<double>& c,
-        const std::vector<double>& d
-    ) = 0;
+        const std::vector<double>& rhs
+    ) const = 0;
 };
 
-#endif
+#endif // TRIDIAGONAL_SOLVER_BASE_HPP

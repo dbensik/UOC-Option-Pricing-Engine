@@ -1,5 +1,5 @@
 
-#include "CustomTridiagonalSolver.hpp"
+#include "TridiagonalSolverBase.hpp"
 #include <stdexcept>
 
 std::vector<double> CustomTridiagonalSolver::solve(

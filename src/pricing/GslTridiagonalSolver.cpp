@@ -1,5 +1,5 @@
 
-#include "GslTridiagonalSolver.hpp"
+#include "TridiagonalSolverBase.hpp"
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_vector.h>
 #include <stdexcept>

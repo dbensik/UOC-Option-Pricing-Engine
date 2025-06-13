@@ -1,23 +1,32 @@
-# Compiler and tools
 CXX = g++
-CXXFLAGS = -Wall -Wextra -O2 -std=c++11 -fopenmp -g
-LDFLAGS = -lgsl -lgslcblas -ldl
+CXXFLAGS = -std=c++17 -Wall -O2 -fopenmp
+INCLUDES = -Isrc -I/usr/include/gsl
+LDFLAGS = -lgsl -lgslcblas -lm
 
-# Source files and objects
-SRCS = TestUoc.cpp UpOutCallOption.cpp optimizer.cpp
+SRC_DIR = src
+CORE_DIR = $(SRC_DIR)/core
+UTILS_DIR = $(SRC_DIR)/utils
+PRICING_DIR = $(SRC_DIR)/pricing
+
+SRCS = \
+	$(CORE_DIR)/UpOutCallOption.cpp \
+	$(UTILS_DIR)/MathUtils.cpp \
+	$(PRICING_DIR)/CustomerTridiagonalSolver.cpp \
+	$(PRICING_DIR)/GslTridiagonalSolver.cpp \
+	main.cpp
+
 OBJS = $(SRCS:.cpp=.o)
-TARGET = TestUoc.out
+TARGET = option_pricing
 
-# Default target
+.PHONY: all clean
+
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CXX) $(OBJS) -o $(TARGET) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $@ $(LDFLAGS)
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
 clean:
-	rm -f *.o $(TARGET)
-
-.PHONY: all clean
+	rm -f $(OBJS) $(TARGET)

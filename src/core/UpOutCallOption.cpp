@@ -3,6 +3,7 @@
 #define UpOutCallOption_cpp
 
 #include "UpOutCallOption.hpp"
+#include "pricing/TridiagonalSolver.hpp"
 #include <tuple>
 
 using std::vector;
@@ -155,34 +156,43 @@ void uocOption::computeGVectors(std::vector<double>& g1LambdaN,
     }
 }
 
+// Updated price method with TridiagonalSolver
 double UpOutCallOption::price() {
     vector<vector<double>> grid(numTimes, vector<double>(numPrices, 0.0));
 
-    // Set terminal condition (payoff)
     for (int j = 0; j < numPrices; ++j) {
         double logS = LogSmin + j * deltax;
         double S = exp(logS);
         grid[numTimes - 1][j] = std::max(S - K, 0.0);
     }
 
-    // Boundary conditions
     for (int i = 0; i < numTimes; ++i) {
-        grid[i][0] = 0.0;                 // S -> 0
-        grid[i][numPrices - 1] = 0.0;     // S -> B (knocked out)
+        grid[i][0] = 0.0;
+        grid[i][numPrices - 1] = 0.0;
     }
 
-    // Time-stepping backwards (placeholder logic)
+    TridiagonalSolver solver;
+    vector<double> a(numPrices - 2), b(numPrices - 2), c(numPrices - 2), rhs(numPrices - 2);
+
     for (int i = numTimes - 2; i >= 0; --i) {
         for (int j = 1; j < numPrices - 1; ++j) {
-            grid[i][j] = 0.5 * (grid[i + 1][j - 1] + grid[i + 1][j + 1]); // Crude average
+            a[j - 1] = Bl;
+            b[j - 1] = 1 - 2 * Bl;
+            c[j - 1] = Bu;
+            rhs[j - 1] = grid[i + 1][j];
+        }
+
+        vector<double> solution = solver.solve(a, b, c, rhs);
+        for (int j = 1; j < numPrices - 1; ++j) {
+            grid[i][j] = solution[j - 1];
         }
     }
 
-    // Interpolation at x = log(S)
     int j = static_cast<int>((x - LogSmin) / deltax);
     double w = (x - (LogSmin + j * deltax)) / deltax;
     return (1 - w) * grid[0][j] + w * grid[0][j + 1];
 }
+
 
 double UpOutCallOption::pricePrint(){
     int gslDim = numPrices - 2;
